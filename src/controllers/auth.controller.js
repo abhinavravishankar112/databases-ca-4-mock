@@ -70,18 +70,39 @@ exports.loginUser = async (req, res) => {
     // =========================
     // TODO: Compare password
     // =========================
-
+    const isMatch = await bcrypt.compare(password, user.password);
+    if(!isMatch){
+      return res.status(401).json({
+        success: false,
+        message: "Invalid email or password"
+      })
+    }
     // =========================
     // TODO: Create payload
     // =========================
-
+    const payload = {
+      id: user._id,
+      username: user.username
+    };
     // =========================
     // TODO: Generate JWT token
     // =========================
+    const token = jwt.sign(
+      payload,
+      process.env.JWT_SECRET,
+      {expiresIn: "1d"}
+    );
 
     // =========================
     // TODO: Send response
     // =========================
+    res.status(200).json({
+      success: true,
+      data: {
+        token,
+        user: payload
+      }
+    })
 
   } catch (error) {
 
